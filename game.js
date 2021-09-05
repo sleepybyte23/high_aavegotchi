@@ -58,20 +58,34 @@ config = {
   },
 };
 
-game = new Phaser.Game(config);
-
 Moralis.initialize("PjIumkL0EMSFA4InKVOu1fBp3XHAqBCdSfMXN6da");
 Moralis.serverURL = "https://xcritfbd8eee.bigmoralis.com:2053/server";
+
+function launch() {
+  console.log("Loading");
+  let user = Moralis.User.current();
+  if (!user) {
+    console.log("Login with Metamast");
+  } else {
+    console.log(user.get("ethAddress"), "logged in");
+    game = new Phaser.Game(config);
+  }
+}
+
+launch();
+
 // add from here down
 async function login() {
   let user = Moralis.User.current();
   if (!user) {
     user = await Moralis.Web3.authenticate();
+    launch();
   }
   console.log("logged in user:", user);
 }
 async function logOut() {
   await Moralis.User.logOut();
+  location.reload();
   console.log("logged out");
 }
 
@@ -79,17 +93,18 @@ document.getElementById("btn-login").onclick = login;
 document.getElementById("btn-logout").onclick = logOut;
 
 function preload() {
-  this.load.spritesheet("player", "assets/playerSpritesheet.png", {
-    frameWidth: 70,
-    frameHeight: 69,
-  });
+  //   this.load.spritesheet("player", "assets/playerSpritesheet.png", {
+  //     frameWidth: 70,
+  //     frameHeight: 69,
+  //   });
   //this.load.spritesheet('player', 'assets/player.png', { frameWidth: 50, frameHeight: 50 });
   //this.load.image('player', 'assets/player.png');
+  this.load.image("player", "assets/player.png");
   this.load.image("bg1", "assets/bg1.png");
   this.load.image("bg2", "assets/bg2.png");
   this.load.image("platform1", "assets/platform1.png");
   this.load.image("collider1", "assets/collider1.png");
-  this.load.image("logo", "assets/logo.png");
+  this.load.image("logo", "assets/logo1.png");
   this.load.image("sun", "assets/sun.png");
   this.load.image("moon", "assets/moon.png");
   this.load.image("startText", "assets/startText.png");
@@ -133,7 +148,7 @@ function create() {
   hiscoreText.depth = 10;
   hiscoreText.setShadow(3, 3, "#117fb8");
 
-  startText = this.add.sprite(270, 420, "startText").setScrollFactor(0);
+  startText = this.add.sprite(270, 450, "startText").setScrollFactor(0);
   startText.depth = 10;
 
   deathText = this.add
@@ -142,20 +157,7 @@ function create() {
     .setVisible(false);
   deathText.depth = 10;
 
-  // startText = this.add.text(270, 420, 'Tap to start', { align: 'center', fontFamily: '"font1", font2, Arial Black', color: '#ffffff'} ).setScrollFactor(0);
-  // startText.setFontSize(40);
-  // startText.setOrigin(0.5);
-  // startText.depth = 10;
-  // startText.setShadow(0, 4, '#117fb8');
-  // // startText.setShadow(0, 4, '#c07011');
-
-  // deathText = this.add.text(270, 400, 'You Died!\n\nTap to restart', { align: 'center', fontFamily: '"font1", font2, Arial Black', color: '#ffffff'} ).setScrollFactor(0).setVisible(false);
-  // deathText.setFontSize(30);
-  // deathText.setOrigin(0.5);
-  // deathText.depth = 10;
-  // deathText.setShadow(0, 3, '#117fb8');
-
-  collider1 = this.physics.add.sprite(270, 1200, "collider1").setVisible(false);
+  collider1 = this.physics.add.sprite(270, 800, "collider1").setVisible(false);
 
   platforms[0] = this.physics.add
     .sprite(270, 800, "platform1")
@@ -188,15 +190,14 @@ function create() {
       this
     );
   }
-  //player = that.physics.add.sprite(500, 250, 'player').setScale(1).refreshBody();
-  player = this.physics.add.sprite(270, 745, "player");
+  player = this.physics.add.sprite(270, 745, "player").setScale(0.4);
   player.setGravityY(520);
   player.setCollideWorldBounds(true);
   player.body.checkCollision.up = false;
   player.body.checkCollision.right = false;
   player.body.checkCollision.left = false;
 
-  player.body.setSize(40, 68, true);
+  player.body.setSize(40, 268, true);
 
   this.anims.create({
     key: "blink",
@@ -204,15 +205,7 @@ function create() {
     frameRate: 10,
   });
 
-  this.time.addEvent({
-    delay: 250,
-    callback: blink,
-    callbackScope: this,
-    loop: true,
-  });
-
   this.physics.add.collider(player, collider1, die, null, this);
-
   this.physics.add.collider(player, platforms[0], landedOnPlatform, null, this);
   this.physics.add.collider(player, platforms[1], landedOnPlatform, null, this);
   this.physics.add.collider(player, platforms[2], landedOnPlatform, null, this);
