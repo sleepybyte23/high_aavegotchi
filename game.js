@@ -92,13 +92,7 @@ async function logOut() {
 document.getElementById("btn-login").onclick = login;
 document.getElementById("btn-logout").onclick = logOut;
 
-function preload() {
-  //   this.load.spritesheet("player", "assets/playerSpritesheet.png", {
-  //     frameWidth: 70,
-  //     frameHeight: 69,
-  //   });
-  //this.load.spritesheet('player', 'assets/player.png', { frameWidth: 50, frameHeight: 50 });
-  //this.load.image('player', 'assets/player.png');
+function preload() {  
   this.load.image("player", "assets/player.png");
   this.load.image("bg1", "assets/bg1.png");
   this.load.image("bg2", "assets/bg2.png");
